@@ -944,6 +944,7 @@ class DayPicker extends React.Component {
                   renderMonth={renderMonth}
                   renderCalendarDay={renderCalendarDay}
                   renderDayContents={renderDayContents}
+                  renderCaption={renderCaption}
                   onMonthTransitionEnd={this.updateStateAfterMonthTransition}
                   monthFormat={monthFormat}
                   daySize={daySize}
