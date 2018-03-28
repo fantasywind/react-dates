@@ -68,6 +68,7 @@ const propTypes = forbidExtraProps({
   renderCalendarDay: PropTypes.func,
   renderDayContents: PropTypes.func,
   renderCalendarInfo: PropTypes.func,
+  renderCaption: PropTypes.func,
   calendarInfoPosition: CalendarInfoPositionShape,
 
   // accessibility
@@ -121,6 +122,7 @@ const defaultProps = {
   renderCalendarDay: undefined,
   renderDayContents: null,
   renderCalendarInfo: null,
+  renderCaption: null,
   calendarInfoPosition: INFO_POSITION_BOTTOM,
 
   // accessibility
@@ -605,6 +607,7 @@ export default class DayPickerSingleDateController extends React.Component {
       renderCalendarDay,
       renderDayContents,
       renderCalendarInfo,
+      renderCaption,
       calendarInfoPosition,
       isFocused,
       isRTL,
@@ -644,6 +647,7 @@ export default class DayPickerSingleDateController extends React.Component {
         renderCalendarDay={renderCalendarDay}
         renderDayContents={renderDayContents}
         renderCalendarInfo={renderCalendarInfo}
+        renderCaption={renderCaption}
         calendarInfoPosition={calendarInfoPosition}
         isFocused={isFocused}
         getFirstFocusableDay={this.getFirstFocusableDay}

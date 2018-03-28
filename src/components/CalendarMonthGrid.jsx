@@ -16,7 +16,8 @@ import isTransitionEndSupported from '../utils/isTransitionEndSupported';
 import getTransformStyles from '../utils/getTransformStyles';
 import getCalendarMonthWidth from '../utils/getCalendarMonthWidth';
 import toISOMonthString from '../utils/toISOMonthString';
-import isAfterDay from '../utils/isAfterDay';
+import isPrevMonth from '../utils/isPrevMonth';
+import isNextMonth from '../utils/isNextMonth';
 
 import ScrollableOrientationShape from '../shapes/ScrollableOrientationShape';
 import DayOfWeekShape from '../shapes/DayOfWeekShape';
@@ -41,9 +42,12 @@ const propTypes = forbidExtraProps({
   onDayMouseEnter: PropTypes.func,
   onDayMouseLeave: PropTypes.func,
   onMonthTransitionEnd: PropTypes.func,
+  onMonthChange: PropTypes.func,
+  onYearChange: PropTypes.func,
   renderMonth: PropTypes.func,
   renderCalendarDay: PropTypes.func,
   renderDayContents: PropTypes.func,
+  renderCaption: PropTypes.func,
   transformValue: PropTypes.string,
   daySize: nonNegativeInteger,
   focusedDate: momentPropTypes.momentObj, // indicates focusable day
@@ -70,10 +74,13 @@ const defaultProps = {
   onDayClick() {},
   onDayMouseEnter() {},
   onDayMouseLeave() {},
+  onMonthChange() {},
+  onYearChange() {},
   onMonthTransitionEnd() {},
   renderMonth: null,
   renderCalendarDay: undefined,
   renderDayContents: null,
+  renderCaption: null,
   transformValue: 'none',
   daySize: DAY_SIZE,
   focusedDate: null,
@@ -117,6 +124,8 @@ class CalendarMonthGrid extends React.Component {
     this.setContainerRef = this.setContainerRef.bind(this);
 
     this.locale = moment.locale();
+    this.onMonthSelect = this.onMonthSelect.bind(this);
+    this.onYearSelect = this.onYearSelect.bind(this);
   }
 
   componentDidMount() {
@@ -141,12 +150,15 @@ class CalendarMonthGrid extends React.Component {
     let newMonths = months;
 
     if (hasMonthChanged && !hasNumberOfMonthsChanged) {
-      if (isAfterDay(initialMonth, this.props.initialMonth)) {
+      if (isNextMonth(this.props.initialMonth, initialMonth)) {
         newMonths = months.slice(1);
         newMonths.push(months[months.length - 1].clone().add(1, 'month'));
-      } else {
+      } else if (isPrevMonth(this.props.initialMonth, initialMonth)) {
         newMonths = months.slice(0, months.length - 1);
         newMonths.unshift(months[0].clone().subtract(1, 'month'));
+      } else {
+        const withoutTransitionMonths = orientation === VERTICAL_SCROLLABLE;
+        newMonths = getMonths(initialMonth, numberOfMonths, withoutTransitionMonths);
       }
     }
 
@@ -220,6 +232,32 @@ class CalendarMonthGrid extends React.Component {
     }
   }
 
+  onMonthSelect(currentMonth, newMonthVal) {
+    const newMonth = currentMonth.clone();
+    const { orientation } = this.props;
+    const { months } = this.state;
+    const withoutTransitionMonths = orientation === VERTICAL_SCROLLABLE;
+    let initialMonthSubtraction = months.indexOf(currentMonth);
+    if (!withoutTransitionMonths) {
+      initialMonthSubtraction -= 1;
+    }
+    newMonth.set('month', newMonthVal).subtract(initialMonthSubtraction, 'months');
+    this.props.onMonthChange(newMonth);
+  }
+
+  onYearSelect(currentMonth, newYearVal) {
+    const newMonth = currentMonth.clone();
+    const { orientation } = this.props;
+    const { months } = this.state;
+    const withoutTransitionMonths = orientation === VERTICAL_SCROLLABLE;
+    let initialMonthSubtraction = months.indexOf(currentMonth);
+    if (!withoutTransitionMonths) {
+      initialMonthSubtraction -= 1;
+    }
+    newMonth.set('year', newYearVal).subtract(initialMonthSubtraction, 'months');
+    this.props.onYearChange(newMonth);
+  }
+
   render() {
     const {
       enableOutsideDays,
@@ -237,6 +275,7 @@ class CalendarMonthGrid extends React.Component {
       renderMonth,
       renderCalendarDay,
       renderDayContents,
+      renderCaption,
       onMonthTransitionEnd,
       firstDayOfWeek,
       focusedDate,
@@ -315,9 +354,12 @@ class CalendarMonthGrid extends React.Component {
                 onDayMouseEnter={onDayMouseEnter}
                 onDayMouseLeave={onDayMouseLeave}
                 onDayClick={onDayClick}
+                onMonthSelect={this.onMonthSelect}
+                onYearSelect={this.onYearSelect}
                 renderMonth={renderMonth}
                 renderCalendarDay={renderCalendarDay}
                 renderDayContents={renderDayContents}
+                renderCaption={renderCaption}
                 firstDayOfWeek={firstDayOfWeek}
                 daySize={daySize}
                 focusedDate={isVisible ? focusedDate : null}

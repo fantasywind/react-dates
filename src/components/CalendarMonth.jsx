@@ -13,6 +13,7 @@ import getPhrasePropTypes from '../utils/getPhrasePropTypes';
 
 import CalendarWeek from './CalendarWeek';
 import CalendarDay from './CalendarDay';
+import MonthSelector from './MonthSelector';
 
 import calculateDimension from '../utils/calculateDimension';
 import getCalendarMonthWeeks from '../utils/getCalendarMonthWeeks';
@@ -40,9 +41,12 @@ const propTypes = forbidExtraProps({
   onDayClick: PropTypes.func,
   onDayMouseEnter: PropTypes.func,
   onDayMouseLeave: PropTypes.func,
+  onMonthSelect: PropTypes.func,
+  onYearSelect: PropTypes.func,
   renderMonth: PropTypes.func,
   renderCalendarDay: PropTypes.func,
   renderDayContents: PropTypes.func,
+  renderCaption: PropTypes.func,
   firstDayOfWeek: DayOfWeekShape,
   setMonthHeight: PropTypes.func,
 
@@ -65,9 +69,12 @@ const defaultProps = {
   onDayClick() {},
   onDayMouseEnter() {},
   onDayMouseLeave() {},
+  onMonthSelect() {},
+  onYearSelect() {},
   renderMonth: null,
   renderCalendarDay: props => (<CalendarDay {...props} />),
   renderDayContents: null,
+  renderCaption: null,
   firstDayOfWeek: null,
   setMonthHeight() {},
 
@@ -152,9 +159,12 @@ class CalendarMonth extends React.Component {
       onDayClick,
       onDayMouseEnter,
       onDayMouseLeave,
+      onMonthSelect,
+      onYearSelect,
       renderMonth,
       renderCalendarDay,
       renderDayContents,
+      renderCaption,
       daySize,
       focusedDate,
       isFocused,
@@ -185,7 +195,8 @@ class CalendarMonth extends React.Component {
             verticalScrollable && styles.CalendarMonth_caption__verticalScrollable,
           )}
         >
-          <strong>{monthTitle}</strong>
+          {renderCaption && renderCaption({month, onMonthSelect, onYearSelect})}
+          {!renderCaption && <strong>{monthTitle}</strong>}
         </div>
 
         <table
@@ -250,4 +261,3 @@ export default withStyles(({ reactDates: { color, font, spacing } }) => ({
     paddingBottom: 7,
   },
 }))(CalendarMonth);
-
