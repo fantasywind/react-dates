@@ -173,8 +173,11 @@ export default class DayPickerSingleDateController extends React.Component {
 
     this.onPrevMonthClick = this.onPrevMonthClick.bind(this);
     this.onNextMonthClick = this.onNextMonthClick.bind(this);
+    this.onMonthChange = this.onMonthChange.bind(this);
+    this.onYearChange = this.onYearChange.bind(this);
 
     this.getFirstFocusableDay = this.getFirstFocusableDay.bind(this);
+    this.setDayPickerRef = this.setDayPickerRef.bind(this);
   }
 
   componentDidMount() {
@@ -398,6 +401,29 @@ export default class DayPickerSingleDateController extends React.Component {
     });
   }
 
+  onMonthChange(newMonth) {
+    const { numberOfMonths, enableOutsideDays, orientation } = this.props;
+    const withoutTransitionMonths = orientation === VERTICAL_SCROLLABLE;
+    const newVisibleDays =
+      getVisibleDays(newMonth, numberOfMonths, enableOutsideDays, withoutTransitionMonths);
+
+    this.setState({
+      currentMonth: newMonth.clone(),
+      visibleDays: this.getModifiers(newVisibleDays),
+    });
+  }
+
+  onYearChange(newMonth) {
+    const { numberOfMonths, enableOutsideDays, orientation } = this.props;
+    const withoutTransitionMonths = orientation === VERTICAL_SCROLLABLE;
+    const newVisibleDays =
+      getVisibleDays(newMonth, numberOfMonths, enableOutsideDays, withoutTransitionMonths);
+
+    this.setState({
+      currentMonth: newMonth.clone(),
+      visibleDays: this.getModifiers(newVisibleDays),
+    });
+  }
 
   getFirstFocusableDay(newMonth) {
     const { date, numberOfMonths } = this.props;
@@ -456,6 +482,10 @@ export default class DayPickerSingleDateController extends React.Component {
       enableOutsideDays,
     ));
     return { currentMonth, visibleDays };
+  }
+
+  setDayPickerRef(ref) {
+    this.dayPicker = ref;
   }
 
   addModifier(updatedDays, day, modifier) {
@@ -626,6 +656,7 @@ export default class DayPickerSingleDateController extends React.Component {
 
     const dayPickerComponent = (
       <DayPicker
+        ref={this.setDayPickerRef}
         orientation={orientation}
         enableOutsideDays={enableOutsideDays}
         modifiers={visibleDays}
@@ -635,6 +666,8 @@ export default class DayPickerSingleDateController extends React.Component {
         onDayMouseLeave={this.onDayMouseLeave}
         onPrevMonthClick={this.onPrevMonthClick}
         onNextMonthClick={this.onNextMonthClick}
+        onMonthChange={this.onMonthChange}
+        onYearChange={this.onYearChange}
         monthFormat={monthFormat}
         withPortal={withPortal}
         hidden={!focused}
