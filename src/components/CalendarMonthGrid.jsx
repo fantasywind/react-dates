@@ -218,7 +218,7 @@ class CalendarMonthGrid extends React.Component {
 
   onMonthSelect(currentMonth, newMonthVal) {
     const newMonth = currentMonth.clone();
-    const { orientation } = this.props;
+    const { onMonthChange, orientation } = this.props;
     const { months } = this.state;
     const withoutTransitionMonths = orientation === VERTICAL_SCROLLABLE;
     let initialMonthSubtraction = months.indexOf(currentMonth);
@@ -226,12 +226,12 @@ class CalendarMonthGrid extends React.Component {
       initialMonthSubtraction -= 1;
     }
     newMonth.set('month', newMonthVal).subtract(initialMonthSubtraction, 'months');
-    this.props.onMonthChange(newMonth);
+    onMonthChange(newMonth);
   }
 
   onYearSelect(currentMonth, newYearVal) {
     const newMonth = currentMonth.clone();
-    const { orientation } = this.props;
+    const { onYearChange, orientation } = this.props;
     const { months } = this.state;
     const withoutTransitionMonths = orientation === VERTICAL_SCROLLABLE;
     let initialMonthSubtraction = months.indexOf(currentMonth);
@@ -239,7 +239,7 @@ class CalendarMonthGrid extends React.Component {
       initialMonthSubtraction -= 1;
     }
     newMonth.set('year', newYearVal).subtract(initialMonthSubtraction, 'months');
-    this.props.onYearChange(newMonth);
+    onYearChange(newMonth);
   }
 
   setContainerRef(ref) {
